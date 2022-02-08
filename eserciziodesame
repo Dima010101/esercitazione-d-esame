@@ -1,0 +1,79 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>
+using namespace std;
+
+struct sfera{
+float diam; //Diametro reale
+char col; //Colore
+float exact; //Diametro nominale
+float atoll; //tolleranza (limite sup valore assoluto scarto)
+float discr; //Scarto tra diam e exact
+};
+
+int main(){
+    //1)apro il file
+    fstream file;
+    file.open("sfere.dat", ios::in);
+    if(!file.good())
+        cerr << "Errore di apertura." << endl;
+    //1)conto gli elementi nel file
+    int count = 0;
+    string tmp;
+    for(;;){
+        getline(file,tmp);
+        if(file.eof()) break;
+        count++;
+    }
+    file.clear();
+    file.seekg(0);
+    cout << "Numero di elementi: " << count << endl;
+    //1)inizializzo un array e stampo a video descrizione diam+col+numero colore palline
+    sfera *array = new sfera[count];
+    int countb = 0, countg = 0, countr = 0;
+    for(int i = 0; i < count; i++){
+        file >> array[i].diam >> array[i].col; 
+        if(array[i].col == 'b'){
+            countb++;
+        }else if(array[i].col == 'g'){
+            countg++;
+        }else if(array[i].col == 'r'){
+            countr++;
+        }
+    }
+    for(int i = 0; i < count; i++){
+        cout << "diam: " << array[i].diam << "....." << "col: " << array[i].col << endl;
+    }
+    file.close();
+    cout << endl;
+    cout << "numero blu: " << countb << "....." << "numero gialle: " << countg << "....." << "numero rosse: " << countr << endl;
+    cout << endl;
+    //2)apro il secondo file e lo inizializzo nell'array
+    fstream file1;
+    file1.open("tolleranze.dat", ios::in);
+    if(!file1.good()) cerr << "Errore." << endl;
+
+    cout << endl;
+        
+    for(int i = 0; i < count; i++){        //arrivato a questo punto riesco abbinare correttamente solo la prima riga del file tolleranze.dat
+        if(array[i].col == 'b'){
+            file1.seekg(1);
+            file1 >> array[i].exact >> array[i].atoll;            
+        }else if(array[i].col == 'g'){
+            file1.seekg(2);
+            file1 >> array[i].exact >> array[i].atoll;
+        }else if(array[i].col == 'r'){
+            file1.seekg(3);
+            file1 >> array[i].exact >> array[i].atoll;
+        }
+    }
+
+    for(int i = 0; i < count; i++){
+        cout << "diam: " << array[i].diam << "....." << "col: " << array[i].col << "....." << "Diam nom: "<< array[i].exact << "....." << "Tolleranza: " << array[i].atoll << endl;
+    } 
+
+
+    delete []array;
+    return 0;
+
+}
